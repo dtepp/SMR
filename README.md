@@ -29,7 +29,7 @@
 2. Open pgAdmin program on your computer and create a Databases call SchoolMajor
 
 3. Use the db file to restore the SchoolMajor database
-![image](https://user-images.githubusercontent.com/38468080/221103673-6f3b7283-c045-4835-b29f-c659a4c2627c.png)
+![image](https://user-images.githubusercontent.com/38468080/221105304-a615db54-6ae5-44c5-b949-60bee7ed187b.png)
 
 
 ### [ 3 ] Deploy the School Major Recommend system locally with virtual enviorment just created
