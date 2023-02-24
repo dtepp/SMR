@@ -29,6 +29,8 @@ class SchoolMajor(db.Model):
         cluster = db.Column(db.String(250), nullable=True)
         label = db.Column(db.String(250), nullable=True)
         date = db.Column(db.String(250), nullable=False)
+        IELTS = db.Column(db.String(10),nullable=True)
+        TOEFL = db.Column(db.String(10),nullable=True)
 
 
 class SchoolLevel(db.Model):
