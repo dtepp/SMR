@@ -41,6 +41,8 @@
 
 1. In project folder terminal using virtual environment: 
 
+ >flask db init
+
  >flask db migrate
  
  >flask db upgrade
