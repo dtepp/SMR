@@ -34,6 +34,11 @@
 
 ### [ 3 ] Deploy the School Major Recommend system locally with virtual enviorment just created
 
+1. Change the defalut PostgreSQL username and password to your database username and password in app.py:
+![image](https://user-images.githubusercontent.com/38468080/221110246-98e99f15-b72b-4b43-95aa-52dd76ac143f.png)
+
+
+
 1. In project folder terminal using virtual environment: 
 
  >flask db migrate
