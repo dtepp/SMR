@@ -1,0 +1,46 @@
+{% include "header.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+  <!-- Page Header -->
+  <header class="masthead" >
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="post-heading">
+            <h1>{{level.levelname}}</h1>
+            <h2 class="subheading">{{level.schoolname}}</h2>
+            <span class="meta">Posted by
+              <a href="#">{{level.level_author.name}}</a>
+              on {{level.date}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- level Content -->
+  <article>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          {{ level.isApply|safe }}
+          {{ level.isAddOn|safe }}
+          {{ level.schoolscore|safe }}
+          {{ level.addscore|safe }}
+          <hr>
+          {% if current_user.id == 1 %}
+            <div class="clearfix">
+            <a class="btn btn-primary float-right" href="{{url_for('edit_level', level_id=level.id)}}">Edit level</a>
+            </div>
+          {% endif %}
+
+
+
+
+          </div>
+      </div>
+    </div>
+  </article>
+
+  <hr>

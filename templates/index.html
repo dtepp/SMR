@@ -1,0 +1,57 @@
+{% include "header.html" %}
+
+  <!-- Page Header -->
+  <header class="masthead" style="background-image: url('static/img/smooth.jpeg')">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="site-heading">
+           
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="row">
+  
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="clearfix" style="  text-align: center;">
+          <a class="btn btn-warning " href="#">Find the major that's right for you</a>
+        </div>
+        {% for major in all_majors %}
+        <div class="post-preview">
+          <a href="{{ url_for('show_major', major_id=major.id) }}">
+            <h2 class="post-title">
+              {{major.majorName}}
+            </h2>
+            <h3 class="post-subtitle">
+              {{major.school}}
+            </h3>
+          </a>
+          <p class="post-meta">Posted by
+            <a href="#">{{ major.author.name }}</a>
+            on {{major.date}}
+             {% if current_user.id  == 1: %}
+              <a href="{{url_for('delete_major', major_id=major.id) }}">✘</a>
+             {% endif %}
+          </p>
+        </div>
+        <hr>
+        {% endfor %}
+
+
+        <!-- New Post -->
+        {% if current_user.id == 1: %}
+        <div class="clearfix">
+          <a class="btn btn-primary float-right" href="{{url_for('add_new_major')}}">Create New major</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <hr>
+

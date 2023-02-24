@@ -1,0 +1,55 @@
+{% include "header.html" %}
+
+  <!-- Page Header -->
+  <header class="masthead" style="background-image: url('static/img/smooth.jpeg')">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="site-heading">
+           
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="row">
+  
+      <div class="col-lg-8 col-md-10 mx-auto">
+
+        {% for level in all_levels %}
+        <div class="post-preview">
+          <a href="{{ url_for('show_level', level_id=level.id) }}">
+            <h2 class="post-title">
+              {{level.levelname}}
+            </h2>
+            <h3 class="post-subtitle">
+              {{level.schoolname}}
+            </h3>
+          </a>
+          <p class="post-meta">Posted by
+            <a href="#">{{ level.level_author.name }}</a>
+            on {{level.date}}
+             {% if current_user.id  == 1: %}
+              <a href="{{url_for('delete_level', level_id=level.id) }}">✘</a>
+             {% endif %}
+          </p>
+        </div>
+        <hr>
+        {% endfor %}
+
+
+        <!-- New Post -->
+        {% if current_user.id == 1: %}
+        <div class="clearfix">
+          <a class="btn btn-primary float-right" href="{{url_for('add_new_level')}}">Create New level</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <hr>
+

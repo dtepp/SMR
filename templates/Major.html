@@ -1,0 +1,48 @@
+{% include "header.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+  <!-- Page Header -->
+  <header class="masthead" style="background-image: url('{{major.img_url}}')">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="post-heading">
+            <h1>{{major.majorName}}</h1>
+            <h2 class="subheading">{{major.school}}</h2>
+            <span class="meta">Posted by
+              <a href="#">{{major.author.name}}</a>
+              on {{major.date}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Major Content -->
+  <article>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          {{ major.applyReq|safe }}
+          {{ major.langReq|safe }}
+          {{ major.Fee|safe }}
+          {{ major.course|safe }}
+          {{ major.cluster|safe }}
+          {{ major.label|safe }}
+          <hr>
+          {% if current_user.id == 1 %}
+            <div class="clearfix">
+            <a class="btn btn-primary float-right" href="{{url_for('edit_major', major_id=major.id)}}">Edit major</a>
+            </div>
+          {% endif %}
+
+
+
+
+          </div>
+      </div>
+    </div>
+  </article>
+
+  <hr>
