@@ -1,3 +1,4 @@
+import pandas as pd
 from flask import Flask, render_template, redirect, url_for, flash, request, abort
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
@@ -264,6 +265,14 @@ with app.app_context():
         db.session.delete(level_to_delete)
         db.session.commit()
         return redirect(url_for('get_all_levels'))
+
+
+    @app.route('/import_excel', methods=["GET", "POST"])
+    def import_excel():
+        print(pd.__version__)
+        print("method run")
+        return 'Excel file imported successfully!'
+
 
 
     if __name__ == "__main__":
