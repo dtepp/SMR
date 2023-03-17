@@ -217,7 +217,7 @@ with app.app_context():
         form = CreateLevelForm()
         if form.validate_on_submit():
             new_level = SchoolLevel(
-                levelname=form.levelname.data,
+                countryName = form.countryName.data,
                 schoolname=form.schoolname.data,
                 isApply=form.isApply.data,
                 isAddOn=form.isAddOn.data,
@@ -237,7 +237,7 @@ with app.app_context():
     def edit_level(level_id):
         level = SchoolLevel.query.get(level_id)
         edit_form = CreateLevelForm(
-            levelname=level.levelname,
+            countryName=level.countryName,
             schoolname=level.schoolname,
             isApply=level.isApply,
             level_author=level.level_author,
@@ -246,7 +246,7 @@ with app.app_context():
             addscore=level.addscore,
         )
         if edit_form.validate_on_submit():
-            level.levelname = edit_form.levelname.data
+            level.countryName = edit_form.countryName.data
             level.schoolname = edit_form.schoolname.data
             level.isApply = edit_form.isApply.data
             level.isAddOn = edit_form.isAddOn.data
@@ -269,7 +269,6 @@ with app.app_context():
 
     @app.route('/import_excel', methods=["GET", "POST"])
     def import_excel():
-        print(pd.__version__)
         print("method run")
         df = pd.read_excel('testresult10.xlsx')
         data = df.values
@@ -291,6 +290,46 @@ with app.app_context():
         db.session.commit()
 
         return 'Excel file imported successfully!'
+
+
+    @app.route('/import_schools', methods=["GET", "POST"])
+    def import_chinaSchool():
+        print("method run")
+        df = pd.read_excel('chinaSchoolGrades.xlsx')
+        data = df.values
+        for i in range(0,len(data)):
+            new_level = SchoolLevel(
+                countryName="China",
+                schoolname=data[i][0],
+                isAddOn=True,
+                addscore=data[i][1],
+                level_author=current_user,
+                date=date.today().strftime("%B %d, %Y")
+            )
+            db.session.add(new_level)
+        db.session.commit()
+
+        return  "you have imported the selected school"
+
+
+    @app.route('/import_Appliedschools', methods=["GET", "POST"])
+    def import_appliedSchool():
+        print("method run")
+        df = pd.read_excel('AppliedcountryAndGrades.xlsx')
+        data = df.values
+        for i in range(0, len(data)):
+            new_level = SchoolLevel(
+                countryName=data[i][1],
+                schoolname=data[i][0],
+                isApply=True,
+                schoolscore=data[i][2],
+                level_author=current_user,
+                date=date.today().strftime("%B %d, %Y")
+            )
+            db.session.add(new_level)
+        db.session.commit()
+
+        return "you have imported the selected school"
 
 
 

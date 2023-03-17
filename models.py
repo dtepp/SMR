@@ -38,7 +38,7 @@ class SchoolLevel(db.Model):
         id = db.Column(db.Integer, primary_key=True)
         author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
         level_author = relationship("User", back_populates="levels")
-        levelname=db.Column(db.Text,nullable=False )
+        countryName=db.Column(db.Text,nullable=True )
         schoolname=db.Column(db.Text,nullable=False )
         isApply=db.Column(db.Boolean,nullable=True )
         isAddOn=db.Column(db.Boolean,nullable=True )

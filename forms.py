@@ -19,7 +19,7 @@ class CreateMajorForm(FlaskForm):
     
     
 class CreateLevelForm(FlaskForm):
-    levelname = StringField("Levelname", validators=[DataRequired()])
+    countryName = StringField("countryName", validators=[DataRequired()])
     schoolname = StringField("School", validators=[DataRequired()])
     isApply = BooleanField("isApply")
     isAddOn = BooleanField("isAddOn")
