@@ -1,3 +1,4 @@
+import pandas as pd
 from flask import Flask, render_template, redirect, url_for, flash, request, abort
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
@@ -264,6 +265,33 @@ with app.app_context():
         db.session.delete(level_to_delete)
         db.session.commit()
         return redirect(url_for('get_all_levels'))
+
+
+    @app.route('/import_excel', methods=["GET", "POST"])
+    def import_excel():
+        print(pd.__version__)
+        print("method run")
+        df = pd.read_excel('testresult10.xlsx')
+        data = df.values
+        for i in range(0, len(data)):
+            new_major = SchoolMajor(
+                majorName=data[i][0],
+                author_id=current_user,
+                school=data[i][1],
+                applyReq=data[i][2],
+                langReq=data[i][3],
+                course=data[i][5],
+                Fee=data[i][4],
+                IELTS=data[i][6],
+                TOEFL=data[i][7],
+                author=current_user,
+                date=date.today().strftime("%B %d, %Y")
+            )
+            db.session.add(new_major)
+        db.session.commit()
+
+        return 'Excel file imported successfully!'
+
 
 
     if __name__ == "__main__":
