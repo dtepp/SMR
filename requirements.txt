@@ -32,3 +32,4 @@ Werkzeug==2.2.2
 WTForms==3.0.1
 zipp==3.12.1
 pandas==1.5.3
+openpyxl==3.1.2
