@@ -287,7 +287,7 @@ with app.app_context():
                 date=date.today().strftime("%B %d, %Y")
             )
             db.session.add(new_major)
-        db.session.commit()
+     #  db.session.commit()
 
         return 'Excel file imported successfully!'
 
@@ -307,7 +307,7 @@ with app.app_context():
                 date=date.today().strftime("%B %d, %Y")
             )
             db.session.add(new_level)
-        db.session.commit()
+      #  db.session.commit()
 
         return  "you have imported the selected school"
 
@@ -327,9 +327,41 @@ with app.app_context():
                 date=date.today().strftime("%B %d, %Y")
             )
             db.session.add(new_level)
-        db.session.commit()
+       # db.session.commit()
 
         return "you have imported the selected school"
+
+    def languageFilter(ielts,toefl):
+        resultMajors = []
+        if ielts == 0 :
+            if toefl == 0:
+                majors = SchoolMajor.query.filter((SchoolMajor.IELTS == None) & (SchoolMajor.TOEFL == None)).all()
+                resultMajors = majors
+            else:
+                majors = SchoolMajor.query.filter((SchoolMajor.IELTS == None)).all()
+                for major in majors:
+                    toeflScore = int(major.TOEFL)
+                    if toefl >= toeflScore:
+                        resultMajors.append(major)
+        else:
+            if toefl == 0:
+                majors = SchoolMajor.query.filter((SchoolMajor.TOEFL == None)).all()
+                for major in majors:
+                    ieltsScore = float(major.IELTS)
+                    if ielts >= ieltsScore:
+                        resultMajors.append(major)
+            else:
+                majors = SchoolMajor.query.all()
+                for major in majors:
+                    ieltsScore = float(major.IELTS)
+                    toeflScore = int(major.TOEFL)
+                    if ielts>= ieltsScore and toefl >= toeflScore:
+                        resultMajors.append(major)
+
+        return resultMajors
+
+
+
 
 
 
