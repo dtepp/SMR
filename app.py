@@ -335,31 +335,44 @@ with app.app_context():
         resultMajors = []
         if ielts == 0 :
             if toefl == 0:
-                majors = SchoolMajor.query.filter((SchoolMajor.IELTS == None) & (SchoolMajor.TOEFL == None)).all()
+                majors = SchoolMajor.query.filter((SchoolMajor.IELTS == 'NaN') & (SchoolMajor.TOEFL == 'NaN')).all()
                 resultMajors = majors
             else:
-                majors = SchoolMajor.query.filter((SchoolMajor.IELTS == None)).all()
+                majors = SchoolMajor.query.filter((SchoolMajor.IELTS == 'NaN')& (SchoolMajor.TOEFL != 'NaN')).all()
+                print(len(majors))
                 for major in majors:
-                    toeflScore = int(major.TOEFL)
+                    toeflScore = int(float(major.TOEFL))
                     if toefl >= toeflScore:
                         resultMajors.append(major)
         else:
             if toefl == 0:
-                majors = SchoolMajor.query.filter((SchoolMajor.TOEFL == None)).all()
+                majors = SchoolMajor.query.filter((SchoolMajor.TOEFL == 'NaN')& (SchoolMajor.IELTS != 'NaN')).all()
                 for major in majors:
                     ieltsScore = float(major.IELTS)
                     if ielts >= ieltsScore:
                         resultMajors.append(major)
             else:
-                majors = SchoolMajor.query.all()
+                majors = SchoolMajor.query.filter((SchoolMajor.TOEFL != 'NaN')& (SchoolMajor.IELTS != 'NaN')).all()
                 for major in majors:
                     ieltsScore = float(major.IELTS)
-                    toeflScore = int(major.TOEFL)
+                    toeflScore = int(float(major.TOEFL))
                     if ielts>= ieltsScore and toefl >= toeflScore:
                         resultMajors.append(major)
 
         return resultMajors
 
+
+
+    def getUnlabelData():
+        majors = SchoolMajor.query.filter((SchoolMajor.cluster == None)).all()
+        return majors
+
+
+    def updateMajors(majors):
+        for major in majors:
+            db.session.merge(major)
+        db.session.commit()
+        return True
 
 
 
