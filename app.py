@@ -361,6 +361,21 @@ with app.app_context():
 
         return resultMajors
 
+    def countryFilter(majorList:SchoolMajor,country):
+        schoolList =  SchoolLevel.query.all()
+        resultSchoolList = []
+        resultMajorList = []
+        for school in schoolList:
+            if school.countryName in country:
+                resultSchoolList.append(school)
+
+        for major in majorList:
+            if major.school in resultSchoolList:
+                resultMajorList.append(major)
+
+        return  resultMajorList
+
+
 
 
     def getUnlabelData():
