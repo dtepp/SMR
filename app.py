@@ -15,7 +15,7 @@ from models import db,User,SchoolMajor,SchoolLevel
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'Absentminderteacherdahuanglikefindjob'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "postgresql://postgres:lily@localhost:5432/SchoolMajor")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "postgresql://postgres:750811582@localhost:5432/SchoolMajor")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 ckeditor = CKEditor(app)
 Bootstrap(app)
@@ -376,22 +376,24 @@ with app.app_context():
         return  resultMajorList
 
 
+    @app.route('/updates', methods=["GET", "POST"])
+    def updateCluster():
+        print("method run")
+        df = pd.read_excel('NMFGroup.xlsx')
+        data = df.values
+        for i in range(0, len(data)):
+
+            major = SchoolMajor.query.filter_by(school=data[i][1], majorName=data[i][0]).first()
+            if major is None:
+                print(i)
+            else:
+                major.cluster = data[i][8]
+                major.label = data[i][9]
+                db.session.add(major)
+                db.session.commit()
 
 
-    def getUnlabelData():
-        majors = SchoolMajor.query.filter((SchoolMajor.cluster == None)).all()
-        return majors
-
-
-    def updateMajors(majors):
-        for major in majors:
-            db.session.merge(major)
-        db.session.commit()
-        return True
-
-
-
-
+        return "you have imported the selected school"
 
     if __name__ == "__main__":
         db.create_all()
