@@ -64,13 +64,14 @@ def find_similar_courses(user_input, filtered_data):
     most_similar_courses = most_similar_cluster_desc[:20]
 
     # Print the most similar courses and their score
-    print("Top 10 most similar courses:\n")
+    print("The most similar courses:\n")
     for i, course in enumerate(most_similar_courses):
         score = similarities[0][km.labels_[most_similar_cluster_idx+i]]
         print(f"{i+1}. {course} (Score: {score:.2f})")
 
      # Find the top 5 most similar courses
     most_similar_clusters_idx = np.argsort(similarities[0])[::-1][:5]
+    print("\nThe Top 5 similar cluster courses:\n")
 
     # Print the most similar clusters
     for i, cluster_idx in enumerate(most_similar_clusters_idx):
