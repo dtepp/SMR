@@ -12,6 +12,16 @@ from nltk.stem import WordNetLemmatizer
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+
+
+
+# Load the data
+data = pd.read_csv('data.csv',header=0)
+
+# Filter out records based on other requirements
+filtered_data = data[(data['group_labels'] == 1)]
+
+
 # Perform K-means clustering for different number of clusters and compute the inertia
 inertia = []
 for n in range(5, 100):
