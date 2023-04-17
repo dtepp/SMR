@@ -6,46 +6,42 @@ from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import  login_user, LoginManager, current_user, logout_user
-from forms import CreateMajorForm, RegisterForm, LoginForm,CreateLevelForm
+from flask_login import login_user, LoginManager, current_user, logout_user
+from forms import CreateMajorForm, RegisterForm, LoginForm, CreateLevelForm
 from flask_gravatar import Gravatar
 from functools import wraps
 import os
 from flask_migrate import Migrate
-from models import db,User,SchoolMajor,SchoolLevel
-
+from models import db, User, SchoolMajor, SchoolLevel
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'Absentminderteacherdahuanglikefindjob'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "postgresql://postgres:750811582@localhost:5432/SchoolMajor")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL",
+                                                       "postgresql://postgres:750811582@localhost:5432/SchoolMajor")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 ckeditor = CKEditor(app)
 Bootstrap(app)
 
-
 db.init_app(app)
 migrate = Migrate(app, db)
-
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 
 with app.app_context():
     # #CONNECT TO DB
-  
 
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
 
-
-
     @app.route('/')
     def get_all_majors():
         majors = SchoolMajor.query.all()
         return render_template("index.html", all_majors=majors, current_user=current_user)
-    
+
+
     @app.route('/levels')
     def get_all_levels():
         levels = SchoolLevel.query.all()
@@ -121,9 +117,9 @@ with app.app_context():
             use_ssl=False,
             base_url=None
         )
-        return render_template("major.html", major=requested_major, current_user=current_user,  gravatar=gravatar)
-    
-    
+        return render_template("major.html", major=requested_major, current_user=current_user, gravatar=gravatar)
+
+
     @app.route("/level/<int:level_id>", methods=["GET", "POST"])
     def show_level(level_id):
         requested_level = SchoolLevel.query.get(level_id)
@@ -137,8 +133,7 @@ with app.app_context():
             use_ssl=False,
             base_url=None
         )
-        return render_template("level.html", level=requested_level, current_user=current_user,  gravatar=gravatar)
-
+        return render_template("level.html", level=requested_level, current_user=current_user, gravatar=gravatar)
 
 
     def admin_only(f):
@@ -149,6 +144,7 @@ with app.app_context():
                 return abort(403)
             # Otherwise continue with the route function
             return f(*args, **kwargs)
+
         return decorated_function
 
 
@@ -197,8 +193,8 @@ with app.app_context():
             major.langReq = edit_form.langReq.data
             major.Fee = edit_form.Fee.data
             major.course = edit_form.course.data
-            major.cluster=edit_form.cluster.data
-            major.label=edit_form.label.data
+            major.cluster = edit_form.cluster.data
+            major.label = edit_form.label.data
             db.session.commit()
             return redirect(url_for("show_major", major_id=major.id))
 
@@ -213,13 +209,14 @@ with app.app_context():
         db.session.commit()
         return redirect(url_for('get_all_majors'))
 
+
     @app.route("/new-level", methods=["GET", "POST"])
     @admin_only
     def add_new_level():
         form = CreateLevelForm()
         if form.validate_on_submit():
             new_level = SchoolLevel(
-                countryName = form.countryName.data,
+                countryName=form.countryName.data,
                 schoolname=form.schoolname.data,
                 isApply=form.isApply.data,
                 isAddOn=form.isAddOn.data,
@@ -289,7 +286,7 @@ with app.app_context():
                 date=date.today().strftime("%B %d, %Y")
             )
             db.session.add(new_major)
-     #  db.session.commit()
+        #  db.session.commit()
 
         return 'Excel file imported successfully!'
 
@@ -299,7 +296,7 @@ with app.app_context():
         print("method run")
         df = pd.read_excel('chinaSchoolGrades.xlsx')
         data = df.values
-        for i in range(0,len(data)):
+        for i in range(0, len(data)):
             new_level = SchoolLevel(
                 countryName="China",
                 schoolname=data[i][0],
@@ -309,9 +306,9 @@ with app.app_context():
                 date=date.today().strftime("%B %d, %Y")
             )
             db.session.add(new_level)
-      #  db.session.commit()
+        #  db.session.commit()
 
-        return  "you have imported the selected school"
+        return "you have imported the selected school"
 
 
     @app.route('/import_Appliedschools', methods=["GET", "POST"])
@@ -329,18 +326,19 @@ with app.app_context():
                 date=date.today().strftime("%B %d, %Y")
             )
             db.session.add(new_level)
-       # db.session.commit()
+        # db.session.commit()
 
         return "you have imported the selected school"
 
-    def languageFilter(ielts,toefl):
+
+    def languageFilter(ielts, toefl):
         resultMajors = []
-        if ielts == 0 :
+        if ielts == 0:
             if toefl == 0:
                 majors = SchoolMajor.query.filter((SchoolMajor.IELTS == 'NaN') & (SchoolMajor.TOEFL == 'NaN')).all()
                 resultMajors = majors
             else:
-                majors = SchoolMajor.query.filter((SchoolMajor.IELTS == 'NaN')& (SchoolMajor.TOEFL != 'NaN')).all()
+                majors = SchoolMajor.query.filter((SchoolMajor.IELTS == 'NaN') & (SchoolMajor.TOEFL != 'NaN')).all()
                 print(len(majors))
                 for major in majors:
                     toeflScore = int(float(major.TOEFL))
@@ -348,23 +346,24 @@ with app.app_context():
                         resultMajors.append(major)
         else:
             if toefl == 0:
-                majors = SchoolMajor.query.filter((SchoolMajor.TOEFL == 'NaN')& (SchoolMajor.IELTS != 'NaN')).all()
+                majors = SchoolMajor.query.filter((SchoolMajor.TOEFL == 'NaN') & (SchoolMajor.IELTS != 'NaN')).all()
                 for major in majors:
                     ieltsScore = float(major.IELTS)
                     if ielts >= ieltsScore:
                         resultMajors.append(major)
             else:
-                majors = SchoolMajor.query.filter((SchoolMajor.TOEFL != 'NaN')& (SchoolMajor.IELTS != 'NaN')).all()
+                majors = SchoolMajor.query.filter((SchoolMajor.TOEFL != 'NaN') & (SchoolMajor.IELTS != 'NaN')).all()
                 for major in majors:
                     ieltsScore = float(major.IELTS)
                     toeflScore = int(float(major.TOEFL))
-                    if ielts>= ieltsScore and toefl >= toeflScore:
+                    if ielts >= ieltsScore and toefl >= toeflScore:
                         resultMajors.append(major)
 
         return resultMajors
 
-    def countryFilter(majorList:SchoolMajor,country):
-        schoolList =  SchoolLevel.query.all()
+
+    def countryFilter(majorList: SchoolMajor, country):
+        schoolList = SchoolLevel.query.all()
         resultSchoolList = []
         resultMajorList = []
         for school in schoolList:
@@ -375,7 +374,7 @@ with app.app_context():
             if major.school in resultSchoolList:
                 resultMajorList.append(major)
 
-        return  resultMajorList
+        return resultMajorList
 
 
     @app.route('/updates', methods=["GET", "POST"])
@@ -393,6 +392,7 @@ with app.app_context():
                 major.label = data[i][9]
                 db.session.add(major)
                 db.session.commit()
+        "you have imported the selected school"
 
 
     @app.route('/webhook', methods=['POST'])
@@ -436,35 +436,56 @@ with app.app_context():
         with open('data.json', 'w') as f:
             json.dump(data, f)
 
-        return make_response(jsonify({'fulfillmentText': resp_text}))
+        return "you have imported the selected school"#make_response(jsonify({'fulfillmentText': resp_text}))
 
 
-    def handleRequest(request:json):
+    def handleRequest(request: json):
         school = request['school_name']
         gpa = request['gpa']
-        ielts = request.get('IELTS', 0)
-        toefl = request.get('TOEFL', 0)
+        ielts = float(request.get('IELTS', 0))
+        toefl = int(request.get('TOEFL', 0))
         country = request['country']
-        schoolInDb = SchoolLevel.query.filter(schoolname = school).first()
+        schoolInDb = SchoolLevel.query.filter_by(schoolname=school).first()
+      
         finalGpa = int(gpa) + int(schoolInDb.addscore)
+        print("final gpa = "+str(finalGpa))
 
-        allSchool =  SchoolLevel.query.filter( (SchoolLevel.country == country) & (SchoolLevel.isapply == True )).all() # country
+        allSchool = SchoolLevel.query.filter(
+            (SchoolLevel.countryName == country) & (SchoolLevel.isApply == True)).all()  # country
+        print("country school ")
+        print(len(allSchool))
         gpaGoodScool = []
         for school in allSchool:
-            requireScore =  int (school.schoolscore)
-            if requireScore<finalGpa:  #  gpa
-                gpaGoodScool.append(school)
-
-
+            requireScore = int(school.schoolscore)
+            if requireScore < finalGpa:  # gpa
+                gpaGoodScool.append(school.schoolname)
+        print("gpa school")
+        print(len(gpaGoodScool))
+        for school in gpaGoodScool:
+            print(school)
         languageResult = languageFilter(ielts, toefl)  # language
+        print("language")
+        print(len(languageResult))
         finalResult = []
         for major in languageResult:
+            name = str(major.school)
             if major.school in gpaGoodScool:
+                print(111)
                 finalResult.append(major)
 
-
-
         return finalResult
+
+
+    @app.route('/test', methods=["GET", "POST"])
+    def testJsom():
+        testData = {"school_name": "Zhejiang University", "gpa": 89.1, "IELTS": "7.0", "TOEFL": 103.0, "country": "China Hong Kong"}
+        myResult = handleRequest(testData)
+        print(len(myResult))
+        for i in range(len(myResult)):
+            print(i)
+        return "you have imported the selected school"
+
+
 
     if __name__ == "__main__":
         db.create_all()
