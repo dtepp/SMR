@@ -15,7 +15,7 @@ nltk.download('punkt')
 nltk.download('wordnet')
 nltk.download('omw-1.4')
 
-def find_similar_courses(user_input, filtered_data):
+def find_similar_courses(user_input, filtered_data,total):
     stop_words = set(stopwords.words('english')+['introduction', 'compulsory', 'course','student'])
     lemmatizer = WordNetLemmatizer()
 
@@ -56,30 +56,24 @@ def find_similar_courses(user_input, filtered_data):
     # Get the cluster centroids
     cluster_centroids = km.cluster_centers_
 
-    # Find the most similar courses
-    similarities = cosine_similarity(user_input_vec, cluster_centroids)
-    most_similar_cluster_idx = np.argmax(similarities)
-    most_similar_cluster = filtered_data[km.labels_ == most_similar_cluster_idx]
-    most_similar_cluster_desc = most_similar_cluster['0'].tolist()
-    most_similar_courses = most_similar_cluster_desc[:20]
 
-    # Print the most similar courses and their score
-    print("The most similar courses:\n")
-    for i, course in enumerate(most_similar_courses):
-        score = similarities[0][km.labels_[most_similar_cluster_idx+i]]
-        print(f"{i+1}. {course} (Score: {score:.2f})")
+   
 
      # Find the top 5 most similar courses
+    similarities = cosine_similarity(user_input_vec, cluster_centroids)
     most_similar_clusters_idx = np.argsort(similarities[0])[::-1][:5]
     print("\nThe Top 5 similar cluster courses:\n")
 
-    # Print the most similar clusters
+ # Print the most similar clusters
+    CourseList=[]
+    n=0
+    
     for i, cluster_idx in enumerate(most_similar_clusters_idx):
         print(f"\n similar courses in cluster {cluster_idx+1}:\n")
         
         # Get the courses in the current cluster
         current_cluster = filtered_data[km.labels_ == cluster_idx]
-        current_cluster_desc = current_cluster['0'].tolist()
+        current_cluster_desc = current_cluster.iloc[:, :5].values.tolist()
 
         # Calculate similarities between user input and courses in the current cluster
         current_cluster_vec = filtered_data_vec[km.labels_ == cluster_idx]
@@ -89,7 +83,16 @@ def find_similar_courses(user_input, filtered_data):
         courses_sorted_by_score = sorted(zip(current_cluster_desc, current_cluster_similarities[0]), key=lambda x: x[1], reverse=True)
 
         # Print top 20 courses and their similarity scores
-        for j, (course, score) in enumerate(courses_sorted_by_score[:20]):
-            print(f"{j+1}. {course} (Score: {score:.2f})")
+        if (n<total):
+            for j, (course, score) in enumerate(courses_sorted_by_score[:20]):
+                print(f"{j+1}. {course} (Score: {score:.2f})")
+                if (n<total):
+                    CourseList.append(course)
+                    n=n+1
+                else:
+                    break
+        else:
+                break
+                
             
-    return most_similar_courses, courses_sorted_by_score
+    return CourseList
