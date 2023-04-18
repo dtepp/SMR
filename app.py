@@ -493,11 +493,13 @@ with app.app_context():
                                     'TOEFL': major.TOEFL,
                                     })
         data = pd.DataFrame(finalResult)
-        print("columns")
-        print(data.columns)
-        okok = find_similar_courses(course, data, 10)
-        print(okok)
-        for major in okok:
+        targetNumber = 10
+        if len(finalResult)<10:
+            targetNumber = len(finalResult)
+
+        alRecommend = find_similar_courses(course, data, targetNumber)
+        print(alRecommend)
+        for major in alRecommend:
             print(major)
 
         return finalResult
