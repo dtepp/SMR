@@ -7,10 +7,13 @@ from flask_ckeditor import CKEditor
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, LoginManager, current_user, logout_user
+
+import os
+from AImodel.Recommend import find_similar_courses
 from forms import CreateMajorForm, RegisterForm, LoginForm, CreateLevelForm
 from flask_gravatar import Gravatar
 from functools import wraps
-import os
+
 from flask_migrate import Migrate
 from models import db, User, SchoolMajor, SchoolLevel
 
@@ -470,8 +473,28 @@ with app.app_context():
         for major in languageResult:
             name = str(major.school)
             if major.school in gpaGoodScool:
-                print(111)
-                finalResult.append(major)
+                finalResult.append({'majorName': major.majorName,
+                                    'school': major.school,
+                                    'applyReq': major.applyReq,
+                                    'langReq': major.langReq,
+                                    'Fee': major.Fee,
+                                    'course': major.course,
+                                    'cluster': major.cluster,
+                                    'label': major.label,
+                                    'IELTS': major.IELTS,
+                                    'TOEFL': major.TOEFL,
+                                   })
+        data =  pd.DataFrame(finalResult)
+        print("columns")
+        print(data.columns)
+
+
+
+        course = "Research Methods Essays, Research Design and Structure Corporate Finance and Real Estate Real Estate Finance Investments Legal Issues in Land Use and Financing Macroeconomics and Housing Property Development"
+        okok = find_similar_courses(course,data,10)
+        print(okok)
+        for major in okok :
+            print( major)
 
         return finalResult
 
@@ -481,8 +504,6 @@ with app.app_context():
         testData = {"school_name": "Zhejiang University", "gpa": 89.1, "IELTS": "7.0", "TOEFL": 103.0, "country": "China Hong Kong"}
         myResult = handleRequest(testData)
         print(len(myResult))
-        for i in range(len(myResult)):
-            print(i)
         return "you have imported the selected school"
 
 
