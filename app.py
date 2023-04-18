@@ -400,6 +400,7 @@ with app.app_context():
 
     @app.route('/webhook', methods=['POST'])
     def webhook():
+        data = {}
         req = request.get_json(silent=True, force=True)
         print('Request:')
         print(json.dumps(req, indent=4))
@@ -432,14 +433,20 @@ with app.app_context():
             data['research_area'] = result[0]
             data['courses'] = result[1]
             # 在这里，调取杜杜的方法，将json传到后端，去进行下一步操作
-            resp_text = "Here are the universities you can apply for."
+
+        resp_text = "Here are the universities you can apply for."
 
         # Save data to file in JSON format
 
         with open('data.json', 'w') as f:
             json.dump(data, f)
 
-        return "you have imported the selected school"#make_response(jsonify({'fulfillmentText': resp_text}))
+        with open('data.json', 'r') as f:
+            input = json.load(f)
+
+        finalResult = handleRequest(input)
+
+        return "you have imported the selected school"
 
 
     def handleRequest(request: json):
@@ -449,9 +456,10 @@ with app.app_context():
         toefl = int(request.get('TOEFL', 0))
         country = request['country']
         schoolInDb = SchoolLevel.query.filter_by(schoolname=school).first()
-      
+        course = request['courses']
+
         finalGpa = int(gpa) + int(schoolInDb.addscore)
-        print("final gpa = "+str(finalGpa))
+        print("final gpa = " + str(finalGpa))
 
         allSchool = SchoolLevel.query.filter(
             (SchoolLevel.countryName == country) & (SchoolLevel.isApply == True)).all()  # country
@@ -483,29 +491,25 @@ with app.app_context():
                                     'label': major.label,
                                     'IELTS': major.IELTS,
                                     'TOEFL': major.TOEFL,
-                                   })
-        data =  pd.DataFrame(finalResult)
+                                    })
+        data = pd.DataFrame(finalResult)
         print("columns")
         print(data.columns)
-
-
-
-        course = "Research Methods Essays, Research Design and Structure Corporate Finance and Real Estate Real Estate Finance Investments Legal Issues in Land Use and Financing Macroeconomics and Housing Property Development"
-        okok = find_similar_courses(course,data,10)
+        okok = find_similar_courses(course, data, 10)
         print(okok)
-        for major in okok :
-            print( major)
+        for major in okok:
+            print(major)
 
         return finalResult
 
 
     @app.route('/test', methods=["GET", "POST"])
     def testJsom():
-        testData = {"school_name": "Zhejiang University", "gpa": 89.1, "IELTS": "7.0", "TOEFL": 103.0, "country": "China Hong Kong"}
+        testData = {"school_name": "Zhejiang University", "gpa": 89.1, "IELTS": "7.0", "TOEFL": 103.0,
+                    "country": "China Hong Kong"}
         myResult = handleRequest(testData)
         print(len(myResult))
         return "you have imported the selected school"
-
 
 
     if __name__ == "__main__":
