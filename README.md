@@ -53,3 +53,23 @@
 ### [ 4 ] Run the systems on browser
 Go to URL using web browser**http://127.0.0.1:5000
 Or: Directly click the link on the frontend terminal
+
+### [ 5 ] DialogFlow and Telegram bot configuration
+
+1. Download the **mycryptobot.zip** file.
+
+2. Open the [DialogFlow](https://dialogflow.cloud.google.com/) website and sign in with your account.
+
+3. Go to **Settings**, and click **Export and Import**, and choose **IMPORT FROM ZIP**:
+![img](https://raw.githubusercontent.com/Stanley7096/MD_Picture/main/dialog_set.png)
+
+4. Download *ngrok.exe* or ngrok binary to your machine from ngrok.com, then:
+
+>cd into the folder holding ngrok.exe
+
+>ngrok.exe http 5000
+
+
+5. Click **Fulfillment** on DialogFlow, and click the **Enable** button of the Webhook. Then copy the Forwarding link of the ngrok, and paste it in the URL line. Don't forget to add **/webhook** after the link:
+![img](https://raw.githubusercontent.com/Stanley7096/MD_Picture/main/webhook.png)
+
