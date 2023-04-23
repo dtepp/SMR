@@ -1,7 +1,8 @@
 import json
 
 import pandas as pd
-from flask import Flask, render_template, redirect, url_for, flash, request, abort
+from flask import Flask, render_template, redirect, url_for, flash, request, abort,url_for,make_response,jsonify
+import ssl
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
 from datetime import date
@@ -30,7 +31,7 @@ migrate = Migrate(app, db)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-
+data = {}
 with app.app_context():
     # #CONNECT TO DB
 
@@ -41,8 +42,12 @@ with app.app_context():
 
     @app.route('/')
     def get_all_majors():
+        url = url_for('get_all_majors', _external=True, _scheme='https')
         majors = SchoolMajor.query.all()
-        return render_template("index.html", all_majors=majors, current_user=current_user)
+        return render_template("index.html", all_majors=majors, current_user=current_user, https_url=url)
+
+
+
 
 
     @app.route('/levels')
@@ -400,7 +405,8 @@ with app.app_context():
 
     @app.route('/webhook', methods=['POST'])
     def webhook():
-        data = {}
+        finish = False
+
         req = request.get_json(silent=True, force=True)
         print('Request:')
         print(json.dumps(req, indent=4))
@@ -426,27 +432,44 @@ with app.app_context():
         if intent_name == 'Country':
             country = req['queryResult']['parameters']['country']
             data['country'] = country
-            resp_text = "Which filed you want to study? Please choose from these research areas: Computer Science, Engineering, Business, Economics, Law, Medicine, Arts, Education, Social Science, Agriculture, Environment. Please describe the details the courses you want to learn from the field you choose: For example, if you choose Computer Science, you can enter 'Computer Science: Machine Learning, Deep Learning, Computer Vision, Natural Language Processing, Data Mining, Data Science, Big Data, etc.'"
+            resp_text = resp_text = "Which filed you want to study? Please choose from these research areas: History, Law, Health, Environmental engineering direction, Education, Fintech, Music, Art, Computer science, Social studies. Please describe the details the courses you want to learn from the field you choose: For example, if you choose Computer science, you can enter 'Computer science: Machine Learning, Deep Learning, Computer Vision, Natural Language Processing, Data Mining, Data Science, Big Data, etc.'"
         if intent_name == 'Research area':
             research_area = req['queryResult']['queryText']
             result = research_area.split(":")
             data['research_area'] = result[0]
             data['courses'] = result[1]
             # 在这里，调取杜杜的方法，将json传到后端，去进行下一步操作
+            resp_text = "Here are the universities you can apply for."
+            finish = True
 
-        resp_text = "Here are the universities you can apply for."
+
 
         # Save data to file in JSON format
 
         with open('data.json', 'w') as f:
             json.dump(data, f)
 
-        with open('data.json', 'r') as f:
-            input = json.load(f)
 
-        finalResult = handleRequest(input)
+        if finish:
+            with open('data.json', 'r') as f:
+                input = json.load(f)
 
-        return "you have imported the selected school"
+            finalResult = handleRequest(input)
+            resp_text = "According to your requirement here is your result"
+            majorNumber = 0
+            for major in finalResult:
+                resp_text = resp_text + major[0]
+                majorNumber = majorNumber + 1
+            return make_response(jsonify({'fulfillmentText': resp_text}))
+
+
+
+
+
+
+
+
+        return make_response(jsonify({'fulfillmentText': resp_text}))
 
 
     def handleRequest(request: json):
@@ -457,6 +480,22 @@ with app.app_context():
         country = request['country']
         schoolInDb = SchoolLevel.query.filter_by(schoolname=school).first()
         course = request['courses']
+        reserch = request['research_area']
+        getSubject = str(reserch).lower()
+        subjects  = {
+            "history":"0",
+            "law":"1",
+            "health inference":"2",
+            "environmental engineering direction":"3",
+            "education":"4",
+            "fintech":"5",
+            "music":"6",
+            "art":"7",
+            "computer science":"8",
+            "social studies":"9"
+        }
+        realSub = subjects.get(getSubject)
+        print(realSub+"------------------subject--------------")
 
         finalGpa = int(gpa) + int(schoolInDb.addscore)
         print("final gpa = " + str(finalGpa))
@@ -480,7 +519,7 @@ with app.app_context():
         finalResult = []
         for major in languageResult:
             name = str(major.school)
-            if major.school in gpaGoodScool:
+            if major.school in gpaGoodScool and major.label == realSub:
                 finalResult.append({'majorName': major.majorName,
                                     'school': major.school,
                                     'applyReq': major.applyReq,
@@ -495,25 +534,38 @@ with app.app_context():
         data = pd.DataFrame(finalResult)
         targetNumber = 10
         if len(finalResult)<10:
+
             targetNumber = len(finalResult)
+            print("2222222222222222222222222")
+            print(targetNumber)
 
         alRecommend = find_similar_courses(course, data, targetNumber)
         print(alRecommend)
-        for major in alRecommend:
-            print(major)
+        number = 0
 
-        return finalResult
+        for major in alRecommend:
+            print(number)
+            print(alRecommend[number][1])
+            print(alRecommend[number][0])
+            number = number +1
+
+
+
+        return alRecommend
 
 
     @app.route('/test', methods=["GET", "POST"])
     def testJsom():
-        testData = {"school_name": "Zhejiang University", "gpa": 89.1, "IELTS": "7.0", "TOEFL": 103.0,
-                    "country": "China Hong Kong"}
-        myResult = handleRequest(testData)
+        with open('data.json', 'r') as f:
+            input = json.load(f)
+            print(input)
+        myResult = handleRequest(input)
         print(len(myResult))
         return "you have imported the selected school"
 
 
     if __name__ == "__main__":
         db.create_all()
-        app.run(debug=True)
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        context.load_cert_chain('server.crt', 'server.key')
+        app.run(ssl_context=context)

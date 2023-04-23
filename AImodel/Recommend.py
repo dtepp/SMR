@@ -52,7 +52,10 @@ def find_similar_courses(user_input, filtered_data, total):
     filtered_data_vec = np.array(filtered_data['course_desc_vec'].tolist())
 
     # Perform K-means clustering
-    km = KMeans(n_clusters=98, random_state=42, init='k-means++', max_iter=1000)
+    number = 98
+    if len(filtered_data)<98:
+        number = len(filtered_data)
+    km = KMeans(n_clusters=number, random_state=42, init='k-means++', max_iter=1000)
     km.fit(filtered_data_vec)
 
     # Get the cluster centroids
@@ -60,15 +63,15 @@ def find_similar_courses(user_input, filtered_data, total):
 
     # Find the top 5 most similar courses
     similarities = cosine_similarity(user_input_vec, cluster_centroids)
-    most_similar_clusters_idx = np.argsort(similarities[0])[::-1][:5]
-    print("\nThe Top 5 similar cluster courses:\n")
+    most_similar_clusters_idx = np.argsort(similarities[0])[::-1][:total]
+    #print("\nThe Top 5 similar cluster courses:\n")
 
     # Print the most similar clusters
     CourseList = []
     n = 0
 
     for i, cluster_idx in enumerate(most_similar_clusters_idx):
-        print(f"\n similar courses in cluster {cluster_idx + 1}:\n")
+        #print(f"\n similar courses in cluster {cluster_idx + 1}:\n")
 
         # Get the courses in the current cluster
         current_cluster = filtered_data[km.labels_ == cluster_idx]
@@ -85,7 +88,7 @@ def find_similar_courses(user_input, filtered_data, total):
         # Print top 20 courses and their similarity scores
         if n < total:
             for j, (course, score) in enumerate(courses_sorted_by_score[:20]):
-                print(f"{j + 1}. {course} (Score: {score:.2f})")
+                #print(f"{j + 1}. {course} (Score: {score:.2f})")
                 if n < total:
                     CourseList.append(course)
                     n = n + 1
