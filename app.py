@@ -449,7 +449,7 @@ with app.app_context():
                 data['IELTS'] = ielts
             if toefl is not None:
                 data['TOEFL'] = toefl
-            resp_text = "Which country you want to presume your postgraduate degree?"
+            resp_text = "Which country you want to presume your postgraduate degree?(U.S. stands for american ,U.k. stands for england , China Hong Kong)"
         if intent_name == 'Country':
             country = req['queryResult']['parameters']['country']
             data['country'] = country
