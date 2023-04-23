@@ -28,7 +28,7 @@
 
 2. Open pgAdmin program on your computer and create a Databases call SchoolMajor
 
-3. Use the db file to restore the SchoolMajor database
+3. Use the DataBase file to restore the SchoolMajor database
 ![image](https://user-images.githubusercontent.com/38468080/221105304-a615db54-6ae5-44c5-b949-60bee7ed187b.png)
 
 
