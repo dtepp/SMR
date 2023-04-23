@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 import pandas as pd
@@ -17,6 +18,7 @@ from functools import wraps
 
 from flask_migrate import Migrate
 from models import db, User, SchoolMajor, SchoolLevel
+import telegram
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'Absentminderteacherdahuanglikefindjob'
@@ -403,6 +405,25 @@ with app.app_context():
         "you have imported the selected school"
 
 
+    async def send_excel_file(chat_id, list):
+        # 将列表转换为DataFrame对象
+        df = pd.DataFrame(list,
+                          columns=['University Name', 'Major Name', 'Language Requirments', 'Major Requirments', 'Fee'])
+
+        # 将DataFrame写入Excel文件
+        df.to_excel('result.xlsx', index=False)
+
+        with open('result.xlsx', 'rb') as f:
+            file_data = f.read()
+
+        # 使用bot token初始化机器人
+        bot = telegram.Bot(token='6029920369:AAH43WlnyDpQCx6zHi0o0N2mG_tW9zezrzc')
+
+        # 发送文件到当前聊天
+        await bot.send_document(chat_id=chat_id, document=file_data, filename='result.xlsx')
+
+
+
     @app.route('/webhook', methods=['POST'])
     def webhook():
         finish = False
@@ -416,7 +437,7 @@ with app.app_context():
         if intent_name == 'University':
             school_name = req['queryResult']['parameters']['university']
             data['school_name'] = school_name
-            resp_text = "What is your GPA?"
+            resp_text = "What is your average score?"
         if intent_name == 'GPA':
             gpa = req['queryResult']['parameters']['gpa']
             data['gpa'] = gpa
@@ -438,11 +459,8 @@ with app.app_context():
             result = research_area.split(":")
             data['research_area'] = result[0]
             data['courses'] = result[1]
-            # 在这里，调取杜杜的方法，将json传到后端，去进行下一步操作
             resp_text = "Here are the universities you can apply for."
             finish = True
-
-
 
         # Save data to file in JSON format
 
@@ -455,18 +473,14 @@ with app.app_context():
                 input = json.load(f)
 
             finalResult = handleRequest(input)
-            resp_text = "According to your requirement here is your result"
             majorNumber = 0
+            my_list = []
             for major in finalResult:
-                resp_text = resp_text + major[0]
+                a = [major[1],major[0],major[3],major[2],major[4]]
+                my_list.append(a)
                 majorNumber = majorNumber + 1
-            return make_response(jsonify({'fulfillmentText': resp_text}))
-
-
-
-
-
-
+            chat_id = req['originalDetectIntentRequest']['payload']['data']['chat']['id']
+            asyncio.run(send_excel_file(chat_id, my_list))
 
 
         return make_response(jsonify({'fulfillmentText': resp_text}))
@@ -495,7 +509,7 @@ with app.app_context():
             "social studies":"9"
         }
         realSub = subjects.get(getSubject)
-        print(realSub+"------------------subject--------------")
+
 
         finalGpa = int(gpa) + int(schoolInDb.addscore)
         print("final gpa = " + str(finalGpa))
@@ -511,8 +525,8 @@ with app.app_context():
                 gpaGoodScool.append(school.schoolname)
         print("gpa school")
         print(len(gpaGoodScool))
-        for school in gpaGoodScool:
-            print(school)
+        #for school in gpaGoodScool:
+            #print(school)
         languageResult = languageFilter(ielts, toefl)  # language
         print("language")
         print(len(languageResult))
@@ -536,8 +550,7 @@ with app.app_context():
         if len(finalResult)<10:
 
             targetNumber = len(finalResult)
-            print("2222222222222222222222222")
-            print(targetNumber)
+            #print(targetNumber)
 
         alRecommend = find_similar_courses(course, data, targetNumber)
         print(alRecommend)
