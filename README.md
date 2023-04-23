@@ -54,7 +54,7 @@
 Go to URL using web browser**http://127.0.0.1:5000
 Or: Directly click the link on the frontend terminal
 
-### [ 5 ] DialogFlow and Telegram bot configuration
+### [ 5 ] DialogFlow configuration
 
 1. Download the **mycryptobot.zip** file.
 
@@ -73,3 +73,14 @@ Or: Directly click the link on the frontend terminal
 5. Click **Fulfillment** on DialogFlow, and click the **Enable** button of the Webhook. Then copy the Forwarding link of the ngrok, and paste it in the URL line. Don't forget to add **/webhook** after the link: (Also DON'T forget to click SAVE at the bottom of the page)
 ![img](https://raw.githubusercontent.com/Stanley7096/MD_Picture/main/webhook.png)
 
+### [ 6 ] Telegram Bot configuration
+
+In your Dialogflow, please note the left sidebar, and click **Integrations** and scroll down, find **Telegram**.
+
+Click **Telegram**, and paste the **Telegram Token**: 
+
+6029920369:AAH43WlnyDpQCx6zHi0o0N2mG_tW9zezrzc
+
+![img](https://raw.githubusercontent.com/Stanley7096/MD_Picture/main/telegram_set.png)
+
+Then you can open your Telegram app, and search **"UniversityRecommenderBot"**, you will find a bot named **University_bot**, click it and talk to it!
