@@ -20,10 +20,11 @@ from flask_migrate import Migrate
 from models import db, User, SchoolMajor, SchoolLevel
 import telegram
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'Absentminderteacherdahuanglikefindjob'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL",
-                                                       "postgresql://postgres:750811582@localhost:5432/SchoolMajor")
+                                                       "postgresql://postgres:lily@localhost:5432/SchoolMajor")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 ckeditor = CKEditor(app)
 Bootstrap(app)
@@ -533,7 +534,7 @@ with app.app_context():
         finalResult = []
         for major in languageResult:
             name = str(major.school)
-            if major.school in gpaGoodScool and major.label == realSub:
+            if name in gpaGoodScool and major.label == realSub:
                 finalResult.append({'majorName': major.majorName,
                                     'school': major.school,
                                     'applyReq': major.applyReq,
