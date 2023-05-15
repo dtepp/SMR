@@ -1,6 +1,6 @@
 # SMR
 
-## SECTION 5 : Installation and User Guide
+## SECTION : Installation and User Guide
 
 ### [ 1 ] System Environment Requirement
 
